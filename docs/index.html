@@ -21,6 +21,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
+        <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
         <style>
             .no-selection {
                 -webkit-user-select: none; /* webkit (safari, chrome) browsers */
@@ -145,6 +146,15 @@
                 </div>
             </div>
         </div>
+        <div style="text-align: center; margin-top: 15px">
+            <textarea readonly placeholder="Javascript produced for the drawn path. Waiting for a drawing..." class="form-control" style="width: 100%; height: 500px" id="js"></textarea>
+        </div>
+        <div>
+            <canvas id="creatjscanvas" width="1000" height="500" style="max-width: 100%"></canvas>
+        </div>
+        <div>
+            <div id="threejscanvas" style="width:1000px;height:500px"></canvas>
+        </div>
         <div class="jumbotron" style="padding-top: 32px; padding-bottom: 32px">
             <h1 class="display-4">Explainations</h1>
             <p class="lead">
@@ -160,15 +170,12 @@
                 <span class="badge badge-secondary">Shift + left click</span> while moving the a bezier construction cursor will allow to adjust the distance without changing the the angle.
             </p>
         </div>
-        <div style="text-align: center; margin-top: 15px">
-            <textarea readonly placeholder="Javascript produced for the drawn path. Waiting for a drawing..." class="form-control" style="width: 100%; height: 500px" id="js"></textarea>
-        </div>
         <footer class="page-footer font-small">
             <div class="footer-copyright text-center py-3">
                 Adrien Castex - <a href="https://github.com/AdrienCastex/HTML5-Canvas-Path-Creator">GitHub</a>
             </div>
         </footer>
         
-        <script src="index.js"></script>
+        <script type="module" src="./js/index.js"></script>
     </body>
 </html>

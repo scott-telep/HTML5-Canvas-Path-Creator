@@ -1,8 +1,16 @@
+import { PointType } from "./PointType.js";
+import { Point } from "./Point.js";
+import { HistoryManager } from "./HistoryManager.js";
+import { Options } from "./Options.js";
+import { ClickType } from "./ClickType.js";
+import { ConstructorFunction } from "./ConstructorType.js";
 
-class Program {
-    public constructor() {
-
+export class Program {
+    public constructor(fn: ConstructorFunction) {
+        this.constructorFunction = fn;
     }
+
+    protected constructorFunction: ConstructorFunction = undefined;
     
     protected points: Point[] = [];
     protected bgImg: HTMLImageElement = undefined;
@@ -306,6 +314,7 @@ class Program {
 
     protected produceJS() {
         let js = '';
+        let cmds = [];
 
         const addLine = (line: string) => {
             js = `${js}\n${this.options.wrapJS ? '    ' : ''}${line}`.trim();
@@ -332,10 +341,12 @@ class Program {
             switch(point.type) {
                 case PointType.LINE:
                     addLine(`ctx.lineTo(${xCoord(point.x)}, ${yCoord(point.y)});`);
+                    cmds.push({cmd:"lineTo",x:point.x,y:point.y})
                     break;
 
                 case PointType.MOVE:
                     addLine(`ctx.moveTo(${xCoord(point.x)}, ${yCoord(point.y)});`);
+                    cmds.push({cmd:"moveTo",x:point.x,y:point.y})
                     break;
 
                 case PointType.BEZIER_CURVE:
@@ -344,8 +355,10 @@ class Program {
                         const absoluteC1 = this.addPointsTogether(point, point.c1);
 
                         addLine(`ctx.bezierCurveTo(${xCoord(absoluteC2.x)}, ${yCoord(absoluteC2.y)}, ${xCoord(absoluteC1.x)}, ${yCoord(absoluteC1.y)}, ${xCoord(point.x)}, ${yCoord(point.y)})`);
+                        cmds.push({cmd:"bezierCurveTo",cp1x:absoluteC2.x,cp1y:absoluteC2.y,cp2x:absoluteC2.x,cp2y:absoluteC2.y,x:point.x,y:point.y})
                     } else {
                         addLine(`ctx.moveTo(${xCoord(point.x)}, ${yCoord(point.y)});`);
+                        cmds.push({cmd:"moveTo",x:point.x,y:point.y})
                     }
                     break;
 
@@ -353,6 +366,7 @@ class Program {
                     const absoluteC3 = this.addPointsTogether(point, point.c3);
 
                     addLine(`ctx.quadraticCurveTo(${xCoord(absoluteC3.x)}, ${yCoord(absoluteC3.y)}, ${xCoord(point.x)}, ${yCoord(point.y)});`);
+                    cmds.push({cmd:"quadraticCurveTo",cpx:absoluteC3.x,cpy:absoluteC3.y,x:point.x,y:point.y})
                     break;
             }
 
@@ -373,6 +387,7 @@ class Program {
             js = `function draw(xoff, yoff, xmul, ymul) {\n    ${js}\n}`;
         }
 
+        this.constructorFunction(cmds);
         return js;
     }
 

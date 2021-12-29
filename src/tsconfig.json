@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-      "module": "system",
+      "module": "ES2020",
       "noImplicitAny": false,
       "removeComments": false,
       "preserveConstEnums": true,
@@ -10,6 +10,6 @@
       ],
       "moduleResolution": "node",
       "target": "ES5",
-      "outFile": "../docs/index.js"
+      "outDir": "../docs/js"
     }
 }

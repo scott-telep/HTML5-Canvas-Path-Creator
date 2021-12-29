@@ -1,5 +1,6 @@
+import { deepClone } from "./deepClone.js";
 
-class HistoryManager<T> {
+export class HistoryManager<T> {
     constructor(maxHistorySize: number = 30) {
         this.maxHistorySize = maxHistorySize;
     }

@@ -1,5 +1,6 @@
+import { PointType } from "./PointType.js";
 
-interface Point {
+export interface Point {
     x: number
     y: number
     relativeTo?: Point

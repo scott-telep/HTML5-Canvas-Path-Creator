@@ -1,5 +1,5 @@
 
-class Options {
+export class Options {
     autoCloseShape = false
     showDots = true
     fillShape = false

@@ -1,77 +1,10 @@
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-};
-var ClickType;
-(function (ClickType) {
-    ClickType[ClickType["ADD"] = 1] = "ADD";
-    ClickType[ClickType["REMOVE"] = 2] = "REMOVE";
-    ClickType[ClickType["MOVE"] = 3] = "MOVE";
-})(ClickType || (ClickType = {}));
-var HistoryManager = /** @class */ (function () {
-    function HistoryManager(maxHistorySize) {
-        if (maxHistorySize === void 0) { maxHistorySize = 30; }
-        this.history = [];
-        this.historyPtr = undefined;
-        this.historyForeward = [];
-        this.maxHistorySize = maxHistorySize;
-    }
-    HistoryManager.prototype.storeInHistory = function (value) {
-        this.historyForeward = [];
-        if (this.historyPtr) {
-            this.history.push(this.historyPtr);
-        }
-        this.historyPtr = deepClone(value);
-        while (this.history.length > this.maxHistorySize) {
-            this.history.shift();
-        }
-    };
-    HistoryManager.prototype.backInHistory = function () {
-        if (this.history.length > 0) {
-            this.historyForeward.push(this.historyPtr);
-            var result = this.history.pop();
-            this.historyPtr = deepClone(result);
-            return result;
-        }
-    };
-    HistoryManager.prototype.forewardInHistory = function () {
-        if (this.historyForeward.length > 0) {
-            this.history.push(this.historyPtr);
-            var result = this.historyForeward.pop();
-            this.historyPtr = deepClone(result);
-            return result;
-        }
-    };
-    return HistoryManager;
-}());
-var Options = /** @class */ (function () {
-    function Options() {
-        this.autoCloseShape = false;
-        this.showDots = true;
-        this.fillShape = false;
-        this.wrapJS = true;
-        this.keepBezierCursorsAligned = false;
-        this.hideBackgroundImage = false;
-        this.showConstructionDotsOnLastClickedPointOnly = false;
-        this.reverseY = false;
-        this.reverseX = false;
-        this.drawingColor = '#000000';
-        this.subDrawingColor = '#888888';
-    }
-    return Options;
-}());
-var PointType;
-(function (PointType) {
-    PointType[PointType["BEZIER_CURVE"] = 1] = "BEZIER_CURVE";
-    PointType[PointType["QUADRATIC_CURVE"] = 4] = "QUADRATIC_CURVE";
-    PointType[PointType["LINE"] = 2] = "LINE";
-    PointType[PointType["MOVE"] = 3] = "MOVE";
-})(PointType || (PointType = {}));
+import { PointType } from "./PointType.js";
+import { HistoryManager } from "./HistoryManager.js";
+import { Options } from "./Options.js";
+import { ClickType } from "./ClickType.js";
 var Program = /** @class */ (function () {
-    function Program() {
+    function Program(fn) {
+        this.constructorFunction = undefined;
         this.points = [];
         this.bgImg = undefined;
         this.options = new Options();
@@ -80,6 +13,7 @@ var Program = /** @class */ (function () {
         this.clickType = ClickType.ADD;
         this.lastClickedPoint = undefined;
         this.historyManager = new HistoryManager(30);
+        this.constructorFunction = fn;
     }
     Program.prototype.getPrecision = function () {
         return parseInt($('#precision').val().toString());
@@ -321,6 +255,7 @@ var Program = /** @class */ (function () {
     Program.prototype.produceJS = function () {
         var _this = this;
         var js = '';
+        var cmds = [];
         var addLine = function (line) {
             js = (js + "\n" + (_this.options.wrapJS ? '    ' : '') + line).trim();
         };
@@ -343,23 +278,28 @@ var Program = /** @class */ (function () {
             switch (point.type) {
                 case PointType.LINE:
                     addLine("ctx.lineTo(" + xCoord(point.x) + ", " + yCoord(point.y) + ");");
+                    cmds.push({ cmd: "lineTo", x: point.x, y: point.y });
                     break;
                 case PointType.MOVE:
                     addLine("ctx.moveTo(" + xCoord(point.x) + ", " + yCoord(point.y) + ");");
+                    cmds.push({ cmd: "moveTo", x: point.x, y: point.y });
                     break;
                 case PointType.BEZIER_CURVE:
                     if (lastPoint) {
                         var absoluteC2 = this.addPointsTogether(lastPoint, lastPoint.c2);
                         var absoluteC1 = this.addPointsTogether(point, point.c1);
                         addLine("ctx.bezierCurveTo(" + xCoord(absoluteC2.x) + ", " + yCoord(absoluteC2.y) + ", " + xCoord(absoluteC1.x) + ", " + yCoord(absoluteC1.y) + ", " + xCoord(point.x) + ", " + yCoord(point.y) + ")");
+                        cmds.push({ cmd: "bezierCurveTo", cp1x: absoluteC2.x, cp1y: absoluteC2.y, cp2x: absoluteC2.x, cp2y: absoluteC2.y, x: point.x, y: point.y });
                     }
                     else {
                         addLine("ctx.moveTo(" + xCoord(point.x) + ", " + yCoord(point.y) + ");");
+                        cmds.push({ cmd: "moveTo", x: point.x, y: point.y });
                     }
                     break;
                 case PointType.QUADRATIC_CURVE:
                     var absoluteC3 = this.addPointsTogether(point, point.c3);
                     addLine("ctx.quadraticCurveTo(" + xCoord(absoluteC3.x) + ", " + yCoord(absoluteC3.y) + ", " + xCoord(point.x) + ", " + yCoord(point.y) + ");");
+                    cmds.push({ cmd: "quadraticCurveTo", cpx: absoluteC3.x, cpy: absoluteC3.y, x: point.x, y: point.y });
                     break;
             }
             lastPoint = point;
@@ -374,6 +314,7 @@ var Program = /** @class */ (function () {
         if (this.options.wrapJS) {
             js = "function draw(xoff, yoff, xmul, ymul) {\n    " + js + "\n}";
         }
+        this.constructorFunction(cmds);
         return js;
     };
     Program.prototype.updateJS = function () {
@@ -544,39 +485,4 @@ var Program = /** @class */ (function () {
     };
     return Program;
 }());
-/**
- * @see https://stackoverflow.com/a/40293777
- */
-function deepClone(obj, hash) {
-    if (hash === void 0) { hash = new WeakMap(); }
-    // Do not try to clone primitives or functions
-    if (Object(obj) !== obj || obj instanceof Function)
-        return obj;
-    if (hash.has(obj))
-        return hash.get(obj); // Cyclic reference
-    try { // Try to run constructor (without arguments, as we don't know them)
-        var result = new obj.constructor();
-    }
-    catch (e) { // Constructor failed, create object without running the constructor
-        result = Object.create(Object.getPrototypeOf(obj));
-    }
-    // Optional: support for some standard constructors (extend as desired)
-    if (obj instanceof Map)
-        Array.from(obj, function (_a) {
-            var key = _a[0], val = _a[1];
-            return result.set(deepClone(key, hash), deepClone(val, hash));
-        });
-    else if (obj instanceof Set)
-        Array.from(obj, function (key) { return result.add(deepClone(key, hash)); });
-    // Register in hash    
-    hash.set(obj, result);
-    // Clone and assign enumerable own properties recursively
-    return Object.assign.apply(Object, __spreadArrays([result], Object.keys(obj).map(function (key) {
-        var _a;
-        return (_a = {}, _a[key] = deepClone(obj[key], hash), _a);
-    })));
-}
-$(function () {
-    var program = new Program();
-    program.initialize();
-});
+export { Program };

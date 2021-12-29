@@ -2,7 +2,7 @@
 /**
  * @see https://stackoverflow.com/a/40293777
  */
-function deepClone(obj, hash = new WeakMap()) {
+export function deepClone(obj, hash = new WeakMap()) {
     // Do not try to clone primitives or functions
     if (Object(obj) !== obj || obj instanceof Function)
         return obj;
