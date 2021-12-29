@@ -3,8 +3,8 @@ import { HistoryManager } from "./HistoryManager.js";
 import { Options } from "./Options.js";
 import { ClickType } from "./ClickType.js";
 var Program = /** @class */ (function () {
-    function Program(fn) {
-        this.constructorFunction = undefined;
+    function Program(simulator) {
+        this.simulator = undefined;
         this.points = [];
         this.bgImg = undefined;
         this.options = new Options();
@@ -13,7 +13,7 @@ var Program = /** @class */ (function () {
         this.clickType = ClickType.ADD;
         this.lastClickedPoint = undefined;
         this.historyManager = new HistoryManager(30);
-        this.constructorFunction = fn;
+        this.simulator = simulator;
     }
     Program.prototype.getPrecision = function () {
         return parseInt($('#precision').val().toString());
@@ -272,6 +272,7 @@ var Program = /** @class */ (function () {
             return _this.options.wrapJS ? c + " * ymul + yoff" : c;
         };
         addLine("ctx.beginPath()");
+        cmds.push({ cmd: "beginFill", color: "#FF0000" });
         var lastPoint = undefined;
         for (var _i = 0, _a = this.points; _i < _a.length; _i++) {
             var point = _a[_i];
@@ -289,7 +290,7 @@ var Program = /** @class */ (function () {
                         var absoluteC2 = this.addPointsTogether(lastPoint, lastPoint.c2);
                         var absoluteC1 = this.addPointsTogether(point, point.c1);
                         addLine("ctx.bezierCurveTo(" + xCoord(absoluteC2.x) + ", " + yCoord(absoluteC2.y) + ", " + xCoord(absoluteC1.x) + ", " + yCoord(absoluteC1.y) + ", " + xCoord(point.x) + ", " + yCoord(point.y) + ")");
-                        cmds.push({ cmd: "bezierCurveTo", cp1x: absoluteC2.x, cp1y: absoluteC2.y, cp2x: absoluteC2.x, cp2y: absoluteC2.y, x: point.x, y: point.y });
+                        cmds.push({ cmd: "bezierCurveTo", cp1x: absoluteC2.x, cp1y: absoluteC2.y, cp2x: absoluteC1.x, cp2y: absoluteC1.y, x: point.x, y: point.y });
                     }
                     else {
                         addLine("ctx.moveTo(" + xCoord(point.x) + ", " + yCoord(point.y) + ");");
@@ -304,6 +305,7 @@ var Program = /** @class */ (function () {
             }
             lastPoint = point;
         }
+        cmds.push({ cmd: "endFill" });
         if (this.options.autoCloseShape) {
             addLine("ctx.closePath();");
         }
@@ -314,7 +316,7 @@ var Program = /** @class */ (function () {
         if (this.options.wrapJS) {
             js = "function draw(xoff, yoff, xmul, ymul) {\n    " + js + "\n}";
         }
-        this.constructorFunction(cmds);
+        this.simulator.simulate(cmds);
         return js;
     };
     Program.prototype.updateJS = function () {

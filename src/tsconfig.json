@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
       "module": "ES2020",
+      "allowJs": true,
       "noImplicitAny": false,
       "removeComments": false,
       "preserveConstEnums": true,
@@ -10,6 +11,7 @@
       ],
       "moduleResolution": "node",
       "target": "ES5",
-      "outDir": "../docs/js"
-    }
+      "outDir": "../docs",
+    },
+    "include": ["**/*"]
 }

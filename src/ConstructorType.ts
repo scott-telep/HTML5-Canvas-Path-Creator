@@ -1,1 +1,0 @@
-export type ConstructorFunction = (cmds: any[]) => void;

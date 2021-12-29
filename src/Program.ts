@@ -3,14 +3,14 @@ import { Point } from "./Point.js";
 import { HistoryManager } from "./HistoryManager.js";
 import { Options } from "./Options.js";
 import { ClickType } from "./ClickType.js";
-import { ConstructorFunction } from "./ConstructorType.js";
+import { Simulator } from "./SimulateType.js";
 
 export class Program {
-    public constructor(fn: ConstructorFunction) {
-        this.constructorFunction = fn;
+    public constructor(simulator: Simulator) {
+        this.simulator = simulator;
     }
 
-    protected constructorFunction: ConstructorFunction = undefined;
+    protected simulator: Simulator = undefined;
     
     protected points: Point[] = [];
     protected bgImg: HTMLImageElement = undefined;
@@ -336,6 +336,7 @@ export class Program {
         };
         
         addLine(`ctx.beginPath()`);
+        cmds.push({cmd:"beginFill",color:"#FF0000"})
         let lastPoint = undefined;
         for(const point of this.points) {
             switch(point.type) {
@@ -355,7 +356,7 @@ export class Program {
                         const absoluteC1 = this.addPointsTogether(point, point.c1);
 
                         addLine(`ctx.bezierCurveTo(${xCoord(absoluteC2.x)}, ${yCoord(absoluteC2.y)}, ${xCoord(absoluteC1.x)}, ${yCoord(absoluteC1.y)}, ${xCoord(point.x)}, ${yCoord(point.y)})`);
-                        cmds.push({cmd:"bezierCurveTo",cp1x:absoluteC2.x,cp1y:absoluteC2.y,cp2x:absoluteC2.x,cp2y:absoluteC2.y,x:point.x,y:point.y})
+                        cmds.push({cmd:"bezierCurveTo",cp1x:absoluteC2.x,cp1y:absoluteC2.y,cp2x:absoluteC1.x,cp2y:absoluteC1.y,x:point.x,y:point.y})
                     } else {
                         addLine(`ctx.moveTo(${xCoord(point.x)}, ${yCoord(point.y)});`);
                         cmds.push({cmd:"moveTo",x:point.x,y:point.y})
@@ -373,6 +374,8 @@ export class Program {
             lastPoint = point;
         }
 
+        cmds.push({cmd:"endFill"});
+
         if(this.options.autoCloseShape) {
             addLine(`ctx.closePath();`);
         }
@@ -387,7 +390,7 @@ export class Program {
             js = `function draw(xoff, yoff, xmul, ymul) {\n    ${js}\n}`;
         }
 
-        this.constructorFunction(cmds);
+        this.simulator.simulate(cmds);
         return js;
     }
 
