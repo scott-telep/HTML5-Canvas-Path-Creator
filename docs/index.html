@@ -133,24 +133,26 @@
                 </div>
             </div>
         </div>
-        <div style="text-align: center" class="mb-4">
-            <div style="display: inline-block">
-                <canvas class="no-selection card" id="canvas" width="1000" height="500" style="max-width: 100%"></canvas>
-                <div class="row">
-                    <div class="col-lg-6" style="text-align: left">
-                        <div style="display: inline-block" id="current-location" data-content="Current position on the canvas" data-toggle="popover">(0, 0)</div>
-                    </div>
-                    <div class="col-lg-6" style="text-align: right">
-                        <div style="display: inline-block" id="last-location" data-content="Position of the last click or the last selected point on the canvas" data-toggle="popover">(0, 0)</div>
+        <div class="row mb-4">
+            <div style="text-align: center" class="col-12">
+                <div style="display: inline-block">
+                    <canvas class="no-selection card" id="canvas" width="500" height="500" style="max-width: 100%"></canvas>
+                    <div class="row">
+                        <div class="col-lg-6" style="text-align: left">
+                            <div style="display: inline-block" id="current-location" data-content="Current position on the canvas" data-toggle="popover">(0, 0)</div>
+                        </div>
+                        <div class="col-lg-6" style="text-align: right">
+                            <div style="display: inline-block" id="last-location" data-content="Position of the last click or the last selected point on the canvas" data-toggle="popover">(0, 0)</div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div>
-            <div id="threejscanvas" style="width:1000px;height:500px"></canvas>
-        </div>
-        <div>
-            <canvas id="creatjscanvas" width="1000" height="500" style="max-width: 100%"></canvas>
+            <div class="col-6">
+                <div id="threejscanvas" class="card" style="width:500px;height:500px"></div>
+            </div>
+            <div class="col-6">
+                <canvas id="creatjscanvas" class="card" width="500" height="500" style="max-width: 100%"></canvas>
+            </div>
         </div>
         <div style="text-align: center; margin-top: 15px">
             <textarea readonly placeholder="Javascript produced for the drawn path. Waiting for a drawing..." class="form-control" style="width: 100%; height: 500px" id="js"></textarea>

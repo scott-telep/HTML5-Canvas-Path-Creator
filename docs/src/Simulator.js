@@ -8,7 +8,7 @@ var Simulator = /** @class */ (function () {
         var g = s.graphics;
         this.g = g;
         this.stage.addChild(s);
-        this.container = { width: 1000, height: 500 };
+        this.container = { width: 500, height: 500 };
         var cnt = document.getElementById("threejscanvas");
         var renderer = new THREE.WebGLRenderer({ alpha: true });
         renderer.setSize(this.container.width, this.container.height);
@@ -20,11 +20,13 @@ var Simulator = /** @class */ (function () {
         var light = new THREE.DirectionalLight(color, intensity);
         light.position.set(-1, 2, 4);
         scene.add(light);
-        var geometry = new THREE.SphereGeometry(1, 32, 16);
-        var material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        var sphere = new THREE.Mesh(geometry, material);
+        /*
+        const geometry = new THREE.SphereGeometry( 1, 32, 16 );
+        const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+        const sphere = new THREE.Mesh( geometry, material );
         sphere.position.z = -5;
-        scene.add(sphere);
+        scene.add( sphere );
+        */
         var axesHelper = new THREE.AxesHelper(10);
         scene.add(axesHelper);
         var controls = new OrbitControls(camera, renderer.domElement);
@@ -112,8 +114,13 @@ var Simulator = /** @class */ (function () {
         this.mainMaterial.metalness = 0.1;
         this.mesh = new THREE.Mesh(geometryFace, this.mainMaterial);
         this.shape = this.mesh;
-        this.mesh.rotation.z = -Math.PI;
+        this.mesh.position.x -= this.container.width / 2 / reducer;
+        this.mesh.position.y -= this.container.height / 2 / reducer;
+        this.mesh.position.z -= extrudeSettings.depth / 2;
+        /*
+        this.mesh.rotation.z = - Math.PI;
         this.mesh.position.z = -5;
+        */
         this.scene.add(this.mesh);
     };
     return Simulator;
