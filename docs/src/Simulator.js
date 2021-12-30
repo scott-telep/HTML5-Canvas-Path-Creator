@@ -47,6 +47,7 @@ var Simulator = /** @class */ (function () {
         var g = this.g;
         g.clear();
         var w = 0;
+        var hF = this.container.height / 2;
         var reducer = 100;
         if (this.shape) {
             this.stage.removeChild(this.shape);
@@ -65,15 +66,15 @@ var Simulator = /** @class */ (function () {
                     break;
                 case "moveTo":
                     g.moveTo(c.x + w, c.y + w);
-                    shape.moveTo(c.x / reducer, c.y / reducer);
+                    shape.moveTo(c.x / reducer, (hF - c.y) / reducer);
                     break;
                 case "bezierCurveTo":
                     g.bezierCurveTo(c.cp1x + w, c.cp1y + w, c.cp2x + w, c.cp2y + w, c.x + w, c.y + w);
-                    shape.bezierCurveTo(c.cp1x / reducer, c.cp1y / reducer, c.cp2x / reducer, c.cp2y / reducer, c.x / reducer, c.y / reducer);
+                    shape.bezierCurveTo(c.cp1x / reducer, (hF - c.cp1y) / reducer, c.cp2x / reducer, (hF - c.cp2y) / reducer, c.x / reducer, (hF - c.y) / reducer);
                     break;
                 case "lineTo":
                     g.lineTo(c.x + w, c.y + w);
-                    shape.lineTo(c.x / reducer, c.y / reducer);
+                    shape.lineTo(c.x / reducer, (hF - c.y) / reducer);
                     break;
                 default:
             }
@@ -115,7 +116,7 @@ var Simulator = /** @class */ (function () {
         this.mesh = new THREE.Mesh(geometryFace, this.mainMaterial);
         this.shape = this.mesh;
         this.mesh.position.x -= this.container.width / 2 / reducer;
-        this.mesh.position.y -= this.container.height / 2 / reducer;
+        // this.mesh.position.y -= this.container.height/2/reducer; 
         this.mesh.position.z -= extrudeSettings.depth / 2;
         /*
         this.mesh.rotation.z = - Math.PI;
