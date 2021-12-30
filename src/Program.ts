@@ -391,7 +391,7 @@ export class Program {
         }
 
         this.simulator.simulate(cmds);
-        return js;
+        return JSON.stringify(cmds);
     }
 
     protected updateJS() {
