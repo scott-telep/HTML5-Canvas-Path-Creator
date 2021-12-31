@@ -229,7 +229,7 @@ var Program = /** @class */ (function () {
                 y: event.offsetY
             };
             var isShiftPressed = event.shiftKey;
-            $('#current-location').text("(" + point.x + ", " + point.y + ")");
+            $('#current-location').text("(" + (point.x - _this.canvas.width / 2) + ", " + (point.y - _this.canvas.height / 2) + ")");
             if (_this.movingPt) {
                 moveMovingPt(point, isShiftPressed);
             }
@@ -271,6 +271,7 @@ var Program = /** @class */ (function () {
             }
             return _this.options.wrapJS ? c + " * ymul + yoff" : c;
         };
+        var z = function (c) { return c - _this.canvas.width / 2; };
         addLine("ctx.beginPath()");
         cmds.push({ cmd: "beginFill", color: "#FF0000" });
         var lastPoint = undefined;
@@ -279,28 +280,28 @@ var Program = /** @class */ (function () {
             switch (point.type) {
                 case PointType.LINE:
                     addLine("ctx.lineTo(" + xCoord(point.x) + ", " + yCoord(point.y) + ");");
-                    cmds.push({ cmd: "lineTo", x: point.x, y: point.y });
+                    cmds.push({ cmd: "lineTo", x: z(point.x), y: z(point.y) });
                     break;
                 case PointType.MOVE:
                     addLine("ctx.moveTo(" + xCoord(point.x) + ", " + yCoord(point.y) + ");");
-                    cmds.push({ cmd: "moveTo", x: point.x, y: point.y });
+                    cmds.push({ cmd: "moveTo", x: z(point.x), y: z(point.y) });
                     break;
                 case PointType.BEZIER_CURVE:
                     if (lastPoint) {
                         var absoluteC2 = this.addPointsTogether(lastPoint, lastPoint.c2);
                         var absoluteC1 = this.addPointsTogether(point, point.c1);
                         addLine("ctx.bezierCurveTo(" + xCoord(absoluteC2.x) + ", " + yCoord(absoluteC2.y) + ", " + xCoord(absoluteC1.x) + ", " + yCoord(absoluteC1.y) + ", " + xCoord(point.x) + ", " + yCoord(point.y) + ")");
-                        cmds.push({ cmd: "bezierCurveTo", cp1x: absoluteC2.x, cp1y: absoluteC2.y, cp2x: absoluteC1.x, cp2y: absoluteC1.y, x: point.x, y: point.y });
+                        cmds.push({ cmd: "bezierCurveTo", cp1x: z(absoluteC2.x), cp1y: z(absoluteC2.y), cp2x: z(absoluteC1.x), cp2y: z(absoluteC1.y), x: z(point.x), y: z(point.y) });
                     }
                     else {
                         addLine("ctx.moveTo(" + xCoord(point.x) + ", " + yCoord(point.y) + ");");
-                        cmds.push({ cmd: "moveTo", x: point.x, y: point.y });
+                        cmds.push({ cmd: "moveTo", x: z(point.x), y: z(point.y) });
                     }
                     break;
                 case PointType.QUADRATIC_CURVE:
                     var absoluteC3 = this.addPointsTogether(point, point.c3);
                     addLine("ctx.quadraticCurveTo(" + xCoord(absoluteC3.x) + ", " + yCoord(absoluteC3.y) + ", " + xCoord(point.x) + ", " + yCoord(point.y) + ");");
-                    cmds.push({ cmd: "quadraticCurveTo", cpx: absoluteC3.x, cpy: absoluteC3.y, x: point.x, y: point.y });
+                    cmds.push({ cmd: "quadraticCurveTo", cpx: z(absoluteC3.x), cpy: z(absoluteC3.y), x: z(point.x), y: z(point.y) });
                     break;
             }
             lastPoint = point;

@@ -10,6 +10,18 @@ export class Simulator {
     const g = s.graphics;
     this.g = g;
     this.stage.addChild(s);
+    s.x = this.canvas.width/2;
+    s.y = this.canvas.height/2;
+    const axis = new createjs.Shape();
+    const ag = axis.graphics;
+    ag.beginStroke("#7CFC00");
+    ag.moveTo(this.canvas.width/2,this.canvas.height/2);
+    ag.lineTo(this.canvas.width/2,0);
+    ag.beginStroke("red");
+    ag.moveTo(this.canvas.width/2,this.canvas.height/2);
+    ag.lineTo(this.canvas.width,this.canvas.height/2);
+    this.stage.addChild(axis);
+    this.stage.update();
 
     this.container = {width:500,height:500};
 
@@ -65,7 +77,7 @@ export class Simulator {
     const g = this.g;
     g.clear();
     const w = 0;
-    const hF = this.container.height/2;
+    const hF = 0;
 
     const reducer = 100;
     if(this.shape) {
@@ -155,7 +167,7 @@ export class Simulator {
 
     this.mesh = new THREE.Mesh( geometryFace, this.mainMaterial ) ;
     this.shape = this.mesh;
-    this.mesh.position.x -= this.container.width/2/reducer; 
+    //this.mesh.position.x -= this.container.width/2/reducer; 
     // this.mesh.position.y -= this.container.height/2/reducer; 
     this.mesh.position.z -= extrudeSettings.depth/2; 
     /*

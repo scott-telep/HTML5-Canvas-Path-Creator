@@ -8,6 +8,18 @@ var Simulator = /** @class */ (function () {
         var g = s.graphics;
         this.g = g;
         this.stage.addChild(s);
+        s.x = this.canvas.width / 2;
+        s.y = this.canvas.height / 2;
+        var axis = new createjs.Shape();
+        var ag = axis.graphics;
+        ag.beginStroke("#7CFC00");
+        ag.moveTo(this.canvas.width / 2, this.canvas.height / 2);
+        ag.lineTo(this.canvas.width / 2, 0);
+        ag.beginStroke("red");
+        ag.moveTo(this.canvas.width / 2, this.canvas.height / 2);
+        ag.lineTo(this.canvas.width, this.canvas.height / 2);
+        this.stage.addChild(axis);
+        this.stage.update();
         this.container = { width: 500, height: 500 };
         var cnt = document.getElementById("threejscanvas");
         var renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -47,7 +59,7 @@ var Simulator = /** @class */ (function () {
         var g = this.g;
         g.clear();
         var w = 0;
-        var hF = this.container.height / 2;
+        var hF = 0;
         var reducer = 100;
         if (this.shape) {
             this.scene.remove(this.shape);
@@ -119,7 +131,7 @@ var Simulator = /** @class */ (function () {
         this.mainMaterial.metalness = 0.1;
         this.mesh = new THREE.Mesh(geometryFace, this.mainMaterial);
         this.shape = this.mesh;
-        this.mesh.position.x -= this.container.width / 2 / reducer;
+        //this.mesh.position.x -= this.container.width/2/reducer; 
         // this.mesh.position.y -= this.container.height/2/reducer; 
         this.mesh.position.z -= extrudeSettings.depth / 2;
         /*
