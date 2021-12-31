@@ -153,9 +153,9 @@ export class Program {
                     pt = this.addPointsTogether(pt, pt.relativeTo);
                 }
 
-                $('#last-location').text(`(${pt.x}, ${pt.y})`);
+                $('#last-location').text(`(${pt.x - this.canvas.width/2}, ${pt.y - this.canvas.height/2})`);
             } else {
-                $('#last-location').text(`(${point.x}, ${point.y})`);
+                $('#last-location').text(`(${point.x - this.canvas.width/2}, ${point.y})`);
             }
             
             if(mouseClick === 'left') {
@@ -338,7 +338,7 @@ export class Program {
         const z = (c) => c - this.canvas.width/2;
         
         addLine(`ctx.beginPath()`);
-        cmds.push({cmd:"beginFill",color:"#FF0000"})
+        cmds.push({cmd:"beginFill",color:"#ff8000"})
         let lastPoint = undefined;
         for(const point of this.points) {
             switch(point.type) {
