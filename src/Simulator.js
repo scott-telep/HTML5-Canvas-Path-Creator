@@ -167,13 +167,7 @@ export class Simulator {
 
     this.mesh = new THREE.Mesh( geometryFace, this.mainMaterial ) ;
     this.shape = this.mesh;
-    //this.mesh.position.x -= this.container.width/2/reducer; 
-    // this.mesh.position.y -= this.container.height/2/reducer; 
     this.mesh.position.z -= extrudeSettings.depth/2; 
-    /*
-    this.mesh.rotation.z = - Math.PI;
-    this.mesh.position.z = -5;
-    */
     this.scene.add(this.mesh); 
     
   }

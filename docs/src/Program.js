@@ -318,7 +318,7 @@ var Program = /** @class */ (function () {
             js = "function draw(xoff, yoff, xmul, ymul) {\n    " + js + "\n}";
         }
         this.simulator.simulate(cmds);
-        return JSON.stringify(cmds);
+        return cmds.map(function (c) { return JSON.stringify(c); }).join("\n") + "\n\n\n" + JSON.stringify(cmds);
     };
     Program.prototype.updateJS = function () {
         var js = this.produceJS();

@@ -4,6 +4,7 @@ import { HistoryManager } from "./HistoryManager.js";
 import { Options } from "./Options.js";
 import { ClickType } from "./ClickType.js";
 import { Simulator } from "./SimulateType.js";
+import { stringify } from "querystring";
 
 export class Program {
     public constructor(simulator: Simulator) {
@@ -393,7 +394,7 @@ export class Program {
         }
 
         this.simulator.simulate(cmds);
-        return JSON.stringify(cmds);
+        return cmds.map(c => JSON.stringify(c)).join("\n") + "\n\n\n" + JSON.stringify(cmds);
     }
 
     protected updateJS() {
