@@ -1,5 +1,7 @@
 # HTML 5 Canvas Path Creator
 
+cd docs && python3 -m http.server && /usr/bin/open -a "/Applications/Google Chrome.app" 'http://localhost:8000/'
+
 ## Description
 
 While trying to develope a 2D video game on THREE.js (WebGL), I wanted to create custom shapes. Because it's using similar features like those of the HTML5 Canvas Path and because Bezier curves are pretty hard to make without a visual tool, I finally created one to ease this process.
