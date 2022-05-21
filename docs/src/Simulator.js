@@ -2,24 +2,48 @@ import * as THREE from '../es_modules/three/build/three.module.js';
 import { OrbitControls } from "../es_modules/three/examples/jsm/controls/OrbitControls.js";
 var Simulator = /** @class */ (function () {
     function Simulator() {
-        this.canvas = document.getElementById("creatjscanvas");
-        this.stage = new createjs.Stage(this.canvas);
-        var s = new createjs.Shape();
-        var g = s.graphics;
-        this.g = g;
-        this.stage.addChild(s);
-        s.x = this.canvas.width / 2;
-        s.y = this.canvas.height / 2;
+        // Canvas2D
+        this.ctxCanvas = document.getElementById("canvas2d");
+        this.ctx = this.ctxCanvas.getContext('2d');
+
+        this.drawAxis = () => {
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = '#7CFC00';
+            this.ctx.moveTo(this.ctxCanvas.width / 2, this.ctxCanvas.height / 2);
+            this.ctx.lineTo(this.ctxCanvas.width / 2, 0);
+            this.ctx.stroke();
+            this.ctx.closePath();
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = 'red';
+            this.ctx.moveTo(this.ctxCanvas.width / 2, this.ctxCanvas.height / 2);
+            this.ctx.lineTo(this.ctxCanvas.width, this.ctxCanvas.height / 2);
+            this.ctx.closePath();
+            this.ctx.stroke();
+        }
+        this.drawAxis();
+
+
+        // CreateJS
+        this.cjsCanvas = document.getElementById("creatjscanvas");
+        this.cjsStage = new createjs.Stage(this.cjsCanvas);
+        var cjsS = new createjs.Shape();
+        var cjsG = cjsS.graphics;
+        this.cjsG = cjsG;
+        this.cjsStage.addChild(cjsS);
+        cjsS.x = this.cjsCanvas.width / 2;
+        cjsS.y = this.cjsCanvas.height / 2;
         var axis = new createjs.Shape();
         var ag = axis.graphics;
         ag.beginStroke("#7CFC00");
-        ag.moveTo(this.canvas.width / 2, this.canvas.height / 2);
-        ag.lineTo(this.canvas.width / 2, 0);
+        ag.moveTo(this.cjsCanvas.width / 2, this.cjsCanvas.height / 2);
+        ag.lineTo(this.cjsCanvas.width / 2, 0);
         ag.beginStroke("red");
-        ag.moveTo(this.canvas.width / 2, this.canvas.height / 2);
-        ag.lineTo(this.canvas.width, this.canvas.height / 2);
-        this.stage.addChild(axis);
-        this.stage.update();
+        ag.moveTo(this.cjsCanvas.width / 2, this.cjsCanvas.height / 2);
+        ag.lineTo(this.cjsCanvas.width, this.cjsCanvas.height / 2);
+        this.cjsStage.addChild(axis);
+        this.cjsStage.update();
+
+        //ThreeJS
         this.container = { width: 500, height: 500 };
         var cnt = document.getElementById("threejscanvas");
         var renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -32,13 +56,6 @@ var Simulator = /** @class */ (function () {
         var light = new THREE.DirectionalLight(color, intensity);
         light.position.set(-1, 2, 4);
         scene.add(light);
-        /*
-        const geometry = new THREE.SphereGeometry( 1, 32, 16 );
-        const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-        const sphere = new THREE.Mesh( geometry, material );
-        sphere.position.z = -5;
-        scene.add( sphere );
-        */
         var axesHelper = new THREE.AxesHelper(10);
         scene.add(axesHelper);
         var controls = new OrbitControls(camera, renderer.domElement);
@@ -56,8 +73,16 @@ var Simulator = /** @class */ (function () {
     }
     Simulator.prototype.simulate = function (cmds) {
         console.log("count =>> ", cmds.length);
-        var g = this.g;
-        g.clear();
+
+        //Canvas2D
+        var ctx = this.ctx;
+        ctx.save();
+        ctx.clearRect(0,0,this.ctxCanvas.width, this.ctxCanvas.height);
+        ctx.translate(this.ctxCanvas.width / 2, this.ctxCanvas.height / 2);
+
+        //CreateJs
+        var cjsG = this.cjsG;
+        cjsG.clear();
         var w = 0;
         var hF = 0;
         var reducer = 100;
@@ -66,36 +91,49 @@ var Simulator = /** @class */ (function () {
         }
         var shape = new THREE.Shape();
         var fill = undefined;
+
         cmds.forEach(function (c) {
             console.log(c);
             switch (c.cmd) {
                 case "beginFill":
-                    g.beginFill(c.color);
+                    ctx.beginPath();
+                    ctx.fillStyle = c.color;
+                    cjsG.beginFill(c.color);
                     fill = c.color;
                     break;
                 case "endFill":
-                    g.endFill();
+                    ctx.closePath();
+                    ctx.fill();
+                    cjsG.endFill();
                     break;
                 case "moveTo":
-                    g.moveTo(c.x + w, c.y + w);
+                    ctx.moveTo(c.x + w, c.y + w);
+                    cjsG.moveTo(c.x + w, c.y + w);
                     shape.moveTo(c.x / reducer, (hF - c.y) / reducer);
                     break;
                 case "bezierCurveTo":
-                    g.bezierCurveTo(c.cp1x + w, c.cp1y + w, c.cp2x + w, c.cp2y + w, c.x + w, c.y + w);
+                    ctx.bezierCurveTo(c.cp1x + w, c.cp1y + w, c.cp2x + w, c.cp2y + w, c.x + w, c.y + w);
+                    cjsG.bezierCurveTo(c.cp1x + w, c.cp1y + w, c.cp2x + w, c.cp2y + w, c.x + w, c.y + w);
                     shape.bezierCurveTo(c.cp1x / reducer, (hF - c.cp1y) / reducer, c.cp2x / reducer, (hF - c.cp2y) / reducer, c.x / reducer, (hF - c.y) / reducer);
                     break;
                 case "quadraticCurveTo":
-                    g.quadraticCurveTo(c.cpx + w, c.cpy + w, c.x + w, c.y + w);
+                    ctx.quadraticCurveTo(c.cpx + w, c.cpy + w, c.x + w, c.y + w);
+                    cjsG.quadraticCurveTo(c.cpx + w, c.cpy + w, c.x + w, c.y + w);
                     shape.quadraticCurveTo(c.cpx / reducer, (hF - c.cpy) / reducer, c.x / reducer, (hF - c.y) / reducer);
                     break;
                 case "lineTo":
-                    g.lineTo(c.x + w, c.y + w);
+                    ctx.lineTo(c.x + w, c.y + w);
+                    cjsG.lineTo(c.x + w, c.y + w);
                     shape.lineTo(c.x / reducer, (hF - c.y) / reducer);
                     break;
                 default:
             }
         });
-        this.stage.update();
+
+        ctx.restore();
+        this.drawAxis();
+        
+        this.cjsStage.update();
         var extrudeSettings = {
             steps: 20,
             depth: 1,
